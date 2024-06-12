@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+
+## Based on https://techdocs.akamai.com/event-viewer/reference/get-events
+import sys
+import threading, signal
+import os
+
+import acc_config.default_config as default_cfg
+import acc_config.version as acc_version
+import modules.argsParser as args
+import modules.aka_api as aka_api
+import modules.aka_log as aka_log
+import modules.events as acc_events
+
+
+stopEvent = threading.Event()
+
+def version():
+    """
+    Print this tools version #
+    :return:
+    """
+    print(acc_version.__version__)
+    sys.exit(0)
+
+def sigterm_handler(signum, frame):
+    """
+    Upon SIGTERM, we signal any other pending activities
+    to stop right away
+    """
+    aka_log.log.debug(f"SIGTERM ({signum}) detected, setting stopEvent")
+    stopEvent.set()
+
+
+def control_break_handler():
+    """
+    Upon CTRL + C, we signal any other pending activities
+    to stop right away
+    """
+    aka_log.log.debug("Control+C detected, setting stopEvent")
+    stopEvent.set()
+
+
+def main():
+    signal.signal(signal.SIGTERM, sigterm_handler)
+
+    my_args = args.init()
+
+    # Load the LOG system
+    aka_log.init(my_args.loglevel, acc_version.__tool_name_short__)
+
+    # Show Version
+    if my_args.version:
+        version()
+    
+    try:
+        if my_args.event_action == "getevents":
+            acc_events.eventViewer(given_args=my_args)
+        else:
+            print("Nothing to do.")
+            sys.exit(1)
+    except Exception as e:
+        print(e)
+        sys.exit(1)
+
+
+    if stopEvent.is_set():
+        sys.exit(100)
+
+    signal.signal(signal.SIGINT, sigterm_handler)
+
+if __name__ == "__main__":
+    main()
+
+# EOF
