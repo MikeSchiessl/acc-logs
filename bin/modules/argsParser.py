@@ -50,6 +50,14 @@ def init():
                              dest="accountswitchkey",
                              default=(os.environ.get('EV_ACCOUNTSWITCHKEY') or ''),
                              help="AccountSwitchKey ID to use('' if not specified).")
+    # USER AGENT
+    parser.add_argument('--user-agent-prefix',
+                        action='store',
+                        type=str,
+                        dest='acc_user_agent_prefix',
+                        default=f"ACC-CLI {version.__version__}",
+                        help="Change the User Agent when making requests"
+                        )
 
 
     # Commands

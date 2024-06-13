@@ -2,7 +2,7 @@
 
 # Generic Settings
 ## CLI default loglevel
-default_log_level = 'DEBUG'
+default_log_level = 'INFO'
 ## CLI available loglevels
 log_levels_available = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 ## How often do we want to retry an auth before failing

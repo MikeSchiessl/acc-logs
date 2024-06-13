@@ -59,13 +59,14 @@ class AkaApi:
                 self.account_key = {'accountSwitchKey': account_key}
 
 
-    def _api_request(self, method="GET", path=None, params={}, payload=None, headers={}, expected_status_list=[200]):
+    def _api_request(self, method="GET", path=None, params={}, headers={}, user_agent=None, expected_status_list=[200]):
         try:
             my_url = self.baseurl + path
-            headers = {"accept": "application/json"}
+            headers["Accept"]  = "application/json"
+            headers['User-Agent'] = user_agent
             if self.account_key:
                 params.update(self.account_key)
-            aka_log.log.debug(f"Sending Request - Method: {method}, Path: {path}")
+            aka_log.log.debug(f"Sending Request - Method: {method}, Path: {path}, Headers: {headers}")
             my_request = self.session.request(method=method.upper(), url=my_url, params=params, headers=headers)
             aka_log.log.debug(f"Sent Request URI: {my_request.url}")
             aka_log.log.debug(f"Received Status: {my_request.status_code}, Text: {my_request.text}")
@@ -82,12 +83,12 @@ class AkaApi:
             self.akalog.warn(f"Request error: {error}")
             return False
 
-    def get_events(self, method="GET", path='/', params={}):
+    def get_events(self, method="GET", path='/', user_agent=None, params={}):
         """
         Get Event Viewer events
         :return: True on success
         """
         #aka_log.log.debug(f"Starting events collection")
-        return self._api_request(method=method, path=path, params=params)
+        return self._api_request(method=method, path=path, params=params, user_agent=user_agent)
 
         

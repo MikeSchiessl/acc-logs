@@ -28,6 +28,7 @@ def get_log(given_args=None, route='/', params={}):
     endtime = dt_end.strftime('%Y-%m-%dT%H:%M:%S')
     #endtime = urllib.parse.quote(dt_end.strftime('%Y-%m-%dT%H:%M:%S'), safe='')
     follow_mode = given_args.event_follow
+    user_agent = given_args.acc_user_agent_prefix
     my_params = params
     if given_args.accountswitchkey:
         accountswitchkey = given_args.accountswitchkey
@@ -50,7 +51,7 @@ def get_log(given_args=None, route='/', params={}):
             aka_log.log.debug(f"Starttime: {starttime}, Endtime: {endtime}, follow mode: {follow_mode}")          
      
         aka_log.log.debug(f"Starting API Request") 
-        my_result = aka_api_request.get_events(method="GET", path=route, params=my_params)
+        my_result = aka_api_request.get_events(method="GET", path=route, user_agent=user_agent, params=my_params)
         aka_log.log.debug(f"Parsing API response ... if any") 
         if my_result is not False:
             aka_log.log.debug(f"Dumping captured events") 
@@ -64,7 +65,7 @@ def get_log(given_args=None, route='/', params={}):
                 while nextEventPage is not False:
                     page_route = get_nextEventPage(my_result['links'])
                     #Capture the next page from the events object
-                    my_result_page = aka_api_request.get_events(method="GET", path=page_route)
+                    my_result_page = aka_api_request.get_events(method="GET", path=page_route, user_agent=user_agent)
                     for line in my_result_page['events']:
                        print(json.dumps(line))
                     nextEventPage = get_nextEventPage(my_result_page['links'])
